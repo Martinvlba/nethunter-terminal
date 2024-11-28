@@ -69,11 +69,11 @@ class ColorSchemeActivity : BaseCustomizeActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item?.itemId) {
+    when (item.itemId) {
       android.R.id.home -> finish()
       R.id.action_done -> applyColorScheme(editingColorScheme)
     }
-    return item?.let { super.onOptionsItemSelected(it) }
+    return item.let { super.onOptionsItemSelected(it) }
   }
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

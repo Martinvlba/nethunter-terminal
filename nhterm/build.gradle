@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-  compileSdkVersion rootProject.ext.android.COMPILE_SDK_VERSION
+  compileSdk rootProject.ext.android.COMPILE_SDK_VERSION
 
   defaultConfig {
     applicationId "com.offsec.nhterm"
@@ -11,7 +11,7 @@ android {
     versionCode rootProject.ext.versionCode
     versionName rootProject.ext.versionName
     testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-    resConfigs 'zh-rCN', 'zh-rTW'
+    resourceConfigurations += ['zh-rCN', 'zh-rTW']
     externalNativeBuild {
       cmake {
         cppFlags "-std=c++11"
@@ -43,17 +43,23 @@ android {
     }
   }
   compileOptions {
-    targetCompatibility 1.8
-    sourceCompatibility 1.8
+    targetCompatibility 17
+    sourceCompatibility 17
   }
   kotlinOptions {
     freeCompilerArgs = ["-Xallow-result-return-type"]
+    jvmTarget = "17"
   }
   lint {
     abortOnError false
     checkReleaseBuilds false
   }
   namespace 'com.offsec.nhterm'
+  packaging {
+    jniLibs {
+      useLegacyPackaging true
+    }
+  }
 }
 
 dependencies {
@@ -64,8 +70,6 @@ dependencies {
   implementation rootProject.ext.deps["kotlin-stdlib"]
 
   implementation 'org.greenrobot:eventbus:3.3.1'
-  implementation 'com.github.wrdlbrnft:modular-adapter:0.3.0.22'
-  implementation 'com.github.wrdlbrnft:sorted-list-adapter:0.3.0.27'
   implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.16'
   implementation 'de.psdev.licensesdialog:licensesdialog:1.9.0'
   implementation 'com.github.GrenderG:Color-O-Matic:1.1.5'
@@ -80,14 +84,18 @@ dependencies {
   implementation 'androidx.preference:preference:1.1.0'
   implementation "androidx.compose.material:material:1.0.0"
 
-  // Backports for lower api levels
-  implementation 'com.llamalab.safs:safs-core:0.2.0'
-  implementation 'me.zhanghai.android.retrofile:library:1.1.1'
-
   implementation project(':chrome-tabs')
   implementation project(':NeoLang')
   implementation project(':NeoTermBridge')
   implementation project(':Xorg')
+
+  // Extra sources
+  // This was done as JCenter has shut down they're repos and listed libs are no longer in repos
+  implementation project(':safs-core')
+  implementation project(':retrofile')
+  implementation project(':modularadapter')
+  implementation project(':sortedlistitemmanager')
+  implementation project(':sortedlistadapter')
 }
 
 java {

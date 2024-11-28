@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-  compileSdkVersion rootProject.ext.android.COMPILE_SDK_VERSION
+  compileSdk rootProject.ext.android.COMPILE_SDK_VERSION
 
   defaultConfig {
     minSdkVersion rootProject.ext.android.MIN_SDK_VERSION
