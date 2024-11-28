@@ -12,6 +12,7 @@
 bin/
 gen/
 .cxx/
+release/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -33,7 +34,7 @@ proguard/
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
-/build
+**/build
 /captures
 .externalNativeBuild
 
