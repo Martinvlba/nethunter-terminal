@@ -21,6 +21,7 @@ import de.psdev.licensesdialog.model.Notices
 import com.offsec.nhterm.App
 import com.offsec.nhterm.R
 import com.offsec.nhterm.component.config.NeoTermPath
+import com.offsec.nhterm.component.nethunter.NethunterComponent
 import com.offsec.nhterm.frontend.floating.TerminalDialog
 import com.offsec.nhterm.utils.extractAssetsDir
 import com.topjohnwu.superuser.Shell
@@ -194,15 +195,7 @@ class AboutActivity : AppCompatActivity() {
      // As some roms act weird and cause issues like no assets are extracted on fresh run then we need to force
      // assets extraction
      ////
-     Shell.cmd("mkdir -p /data/data/com.offsec.nhterm/files/usr/").exec()
-     Shell.cmd("rm -rf /data/data/com.offsec.nhterm/files/usr/bin/*").exec()
-
-     extractAssetsDir("bin", "/data/data/com.offsec.nhterm/files/usr/bin/")
-
-     context.extractAssetsDir("bin", NeoTermPath.BIN_PATH)
-     binDir.listFiles()?.forEach {
-       Os.chmod(it.absolutePath, 448 /*Dec of 0700*/)
-     }
+     NethunterComponent.init(this)
   }
 
   private fun openUrl(url: String) {

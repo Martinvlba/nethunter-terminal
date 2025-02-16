@@ -20,6 +20,7 @@ import com.offsec.nhterm.component.session.XSession
 import com.offsec.nhterm.setup.SetupHelper
 import com.offsec.nhterm.ui.other.AboutActivity
 import com.offsec.nhterm.ui.term.NeoTermActivity
+import com.offsec.nhterm.utils.Executer
 import com.offsec.nhterm.utils.NLog
 import com.offsec.nhterm.utils.Terminals
 import com.offsec.nhterm.utils.extractAssetsDir
@@ -49,51 +50,12 @@ class NeoTermService : Service() {
   override fun onCreate() {
     super.onCreate()
 
-    // Check whather we need to populate initial boot scripts or not
-    // By simply checking */usr folder of ours
-    if (!checkPrefix()) {
-      resetApp()
-    }
-
     createNotificationChannel()
     startForeground(NOTIFICATION_ID, createNotification())
   }
 
   override fun onBind(intent: Intent): IBinder? {
     return serviceBinder
-  }
-
-  fun resetApp() {
-    // Manual way of resetting required assets
-    Runtime.getRuntime().exec("mkdir -p "+" "+"/data/data/com.offsec.nhterm/files/usr/").waitFor()
-    Executer("/system/bin/rm -rf /data/data/com.offsec.nhterm/files/usr/bin")
-    Thread.sleep(1200)
-    extractAssetsDir("bin", "/data/data/com.offsec.nhterm/files/usr/bin/")
-    Thread.sleep(800)
-    Executer("/system/bin/chmod +x /data/data/com.offsec.nhterm/files/usr/bin/bash") // Static bash for arm ( works for *64 too )
-    Executer("/system/bin/chmod +x /data/data/com.offsec.nhterm/files/usr/bin/kali") // Kali chroot scriptlet
-    Executer("/system/bin/chmod +x /data/data/com.offsec.nhterm/files/usr/bin/android-su") // Android su scriptlet
-  }
-
-  fun Executer(command: String?): String? {
-    val output = StringBuilder()
-    val p: Process
-    try {
-      p = Runtime.getRuntime().exec(command)
-      p.waitFor()
-      val reader = BufferedReader(InputStreamReader(p.inputStream))
-      var line: String?
-      while (reader.readLine().also { line = it } != null) {
-        output.append(line).append('\n')
-      }
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-    return output.toString()
-  }
-  fun checkPrefix(): Boolean {
-    val PREFIX_FILE = File(NeoTermPath.USR_PATH)
-    return !PREFIX_FILE.isDirectory
   }
 
   override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

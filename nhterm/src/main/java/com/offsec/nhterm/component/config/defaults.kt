@@ -29,7 +29,7 @@ object NeoTermPath {
   @SuppressLint("SdCardPath")
   const val ROOT_PATH = "/data/data/com.offsec.nhterm/files"
   const val USR_PATH = "$ROOT_PATH/usr"
-  val BIN_PATH = "$USR_PATH/bin_$sysarch"
+  const val BIN_PATH = "$USR_PATH/bin"
   const val HOME_PATH = "/"
   const val APT_BIN_PATH = "$USR_PATH/bin/apt"
   const val LIB_PATH = "$USR_PATH/lib"

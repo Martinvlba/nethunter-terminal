@@ -1,5 +1,6 @@
 package com.offsec.nhterm.utils
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
@@ -10,6 +11,8 @@ import android.provider.MediaStore
 import com.offsec.nhterm.R
 import com.offsec.nhterm.component.config.NeoTermPath
 import com.offsec.nhterm.frontend.floating.TerminalDialog
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.text.DecimalFormat
@@ -37,6 +40,24 @@ fun Long.formatSizeInKB(): String {
   }
 }
 
+fun Executer(command: String?): String? {
+  val output = StringBuilder()
+  val p: Process
+  try {
+    p = Runtime.getRuntime().exec(command)
+    p.waitFor()
+    val reader = BufferedReader(InputStreamReader(p.inputStream))
+    var line: String?
+    while (reader.readLine().also { line = it } != null) {
+      output.append(line).append('\n')
+    }
+  } catch (e: Exception) {
+    e.printStackTrace()
+  }
+  return output.toString()
+}
+
+@SuppressLint("SuspiciousIndentation")
 fun Context.extractAssetsDir(assetDir: String, extractDir: String) = kotlin.runCatching {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
   val targetDir = Paths.get(extractDir)
