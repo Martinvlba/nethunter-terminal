@@ -563,10 +563,11 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
   private fun addNewAndroidSession(sessionName: String?) {
     val sessionCallback = TermSessionCallback()
     val viewClient = TermViewClient(this)
+    val sysarch = System.getProperty("os.arch")
 
     val parameter = ShellParameter()
       .callback(sessionCallback)
-      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin/bash")
+      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin_$sysarch/bash")
       .systemShell(true)
 
     val session = termService!!.createTermSession(parameter)
@@ -583,10 +584,11 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
   private fun addNewNetHunterSession(sessionName: String?) {
     val sessionCallback = TermSessionCallback()
     val viewClient = TermViewClient(this)
+    val sysarch = System.getProperty("os.arch")
 
     val parameter = ShellParameter()
       .callback(sessionCallback)
-      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin/kali")
+      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin_$sysarch/kali")
     val session = termService!!.createTermSession(parameter)
 
     session.mSessionName = sessionName ?: generateSessionName("Kali Shell")
@@ -602,10 +604,11 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
   private fun addNewRootSession(sessionName: String?) {
     val sessionCallback = TermSessionCallback()
     val viewClient = TermViewClient(this)
+    val sysarch = System.getProperty("os.arch")
 
     val parameter = ShellParameter()
       .callback(sessionCallback)
-      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin/android-su")
+      .executablePath("/data/data/com.offsec.nhterm/files/usr/bin_$sysarch/android-su")
       .systemShell(true)
 
     val session = termService!!.createTermSession(parameter)
@@ -651,7 +654,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     val parameter = XParameter()
     val session = termService!!.createXSession(this, parameter)
 
-    session.mSessionName = generateXSessionName("X")
+    session.mSessionName = generateXSessionName("Xorg")
     val tab = createXTab(session.mSessionName) as XSessionTab
     tab.session = session
 

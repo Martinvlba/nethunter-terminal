@@ -1,11 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-  ext.kotlin_version = '1.8.10'
+  ext.kotlin_version = '1.8.22'
   ext.android = [
-    KOTLIN_VERSION     : '1.8.10',
+    KOTLIN_VERSION     : '1.8.22',
     MIN_SDK_VERSION    : 21,
-    COMPILE_SDK_VERSION: 33,
+    COMPILE_SDK_VERSION: 35,
     TARGET_SDK_VERSION : 28,
     JUNIT_VERSION      : "4.12"
   ]
@@ -14,8 +14,8 @@ buildscript {
   ext {
     //version=YYYYMMVVRR (Either "VV" for stable version OR "RR" for pre-release candidate (e.g. 0001 for rc1))
     //noinspection HighAppVersionCode
-    versionCode=2023040100
-    versionName="2023.4"
+    versionCode=2025021600
+    versionName="2025.1"
   }
 
   ext.deps = [

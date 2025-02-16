@@ -24,10 +24,12 @@ object DefaultValues {
 }
 
 object NeoTermPath {
+  private val sysarch = System.getProperty("os.arch")
+
   @SuppressLint("SdCardPath")
   const val ROOT_PATH = "/data/data/com.offsec.nhterm/files"
   const val USR_PATH = "$ROOT_PATH/usr"
-  const val BIN_PATH = "$USR_PATH/bin"
+  val BIN_PATH = "$USR_PATH/bin_$sysarch"
   const val HOME_PATH = "/"
   const val APT_BIN_PATH = "$USR_PATH/bin/apt"
   const val LIB_PATH = "$USR_PATH/lib"

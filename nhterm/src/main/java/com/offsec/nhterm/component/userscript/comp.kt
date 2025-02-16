@@ -28,7 +28,7 @@ class UserScriptComponent : NeoComponent {
 
   fun extractDefaultScript(context: Context) = kotlin.runCatching {
     Shell.cmd("mkdir -p /data/data/com.offsec.nhterm/files/usr/").exec()
-    Shell.cmd("rm -rf /data/data/com.offsec.nhterm/files/usr/bin/*")
+    Shell.cmd("rm -rf /data/data/com.offsec.nhterm/files/usr/bin_*/*")
 
     // Usual user script extraction
     context.extractAssetsDir("scripts", NeoTermPath.USER_SCRIPT_PATH)
@@ -38,7 +38,14 @@ class UserScriptComponent : NeoComponent {
     }
 
     // Lets also extract the usual binaries too here
-    context.extractAssetsDir("bin", NeoTermPath.BIN_PATH)
+    val sysarch = System.getProperty("os.arch")
+
+    if ( sysarch == "aarch64") {
+      context.extractAssetsDir("bin_aarch64", NeoTermPath.BIN_PATH)
+    } else {
+      context.extractAssetsDir("bin_armv7l", NeoTermPath.BIN_PATH)
+    }
+
     binDir.listFiles()?.forEach {
       Os.chmod(it.absolutePath, 448 /*Dec of 0700*/)
     }
