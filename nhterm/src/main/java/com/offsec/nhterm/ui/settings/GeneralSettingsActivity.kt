@@ -1,10 +1,9 @@
 package com.offsec.nhterm.ui.settings
 
 import android.os.Bundle
-import android.preference.PreferenceActivity
 import android.view.MenuItem
-import androidx.preference.Preference
 import com.offsec.nhterm.R
+
 
 /**
  * @author kiva
@@ -18,7 +17,8 @@ class GeneralSettingsActivity : BasePreferenceActivity() {
     addPreferencesFromResource(R.xml.setting_general)
   }
 
-  override fun onBuildHeaders(target: MutableList<PreferenceActivity.Header>?) {
+  override fun onBuildHeaders(target: MutableList<Header>) {
+
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

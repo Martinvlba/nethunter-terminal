@@ -1,24 +1,23 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <jni.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 
-#define __nhterm_no_return __attribute__((__noreturn__))
-
-#define TERMUX_UNUSED(x) x __attribute__((__unused__))
+#define NEO_UNUSED(x) x __attribute__((__unused__))
 #ifdef __APPLE__
 # define LACKS_PTSNAME_R
 #endif
 
-static int throw_runtime_exception(JNIEnv *env, char const *message) {
+static int throw_runtime_exception(JNIEnv *env, const char *message) {
     jclass exClass = env->FindClass("java/lang/RuntimeException");
+    if (!exClass) return -1; // Handle the case where FindClass fails.
     env->ThrowNew(exClass, message);
     return -1;
 }
@@ -30,7 +29,9 @@ static int create_subprocess(JNIEnv *env,
                              char **envp,
                              int *pProcessId,
                              jint rows,
-                             jint columns) {
+                             jint columns,
+                             int cellWidth,
+                             int cellHeight) {
     int ptm = open("/dev/ptmx", O_RDWR | O_CLOEXEC);
     if (ptm < 0) return throw_runtime_exception(env, "Cannot open /dev/ptmx");
 
@@ -57,7 +58,7 @@ static int create_subprocess(JNIEnv *env,
     tcsetattr(ptm, TCSANOW, &tios);
 
     /** Set initial winsize. */
-    struct winsize sz = {.ws_row = static_cast<unsigned short>(rows), .ws_col = static_cast<unsigned short>(columns)};
+    struct winsize sz = {.ws_row = (unsigned short)(rows), .ws_col = (unsigned short) columns, .ws_xpixel = (unsigned short) (columns * cellWidth), .ws_ypixel = (unsigned short) (rows * cellHeight)};
     ioctl(ptm, TIOCSWINSZ, &sz);
 
     pid_t pid = fork();
@@ -116,22 +117,24 @@ static int create_subprocess(JNIEnv *env,
 
 extern "C" JNIEXPORT jint JNICALL Java_com_offsec_nhterm_backend_JNI_createSubprocess(
         JNIEnv *env,
-        jclass TERMUX_UNUSED(clazz),
+        jclass NEO_UNUSED(clazz),
         jstring cmd,
         jstring cwd,
         jobjectArray args,
         jobjectArray envVars,
         jintArray processIdArray,
         jint rows,
-        jint columns) {
+        jint columns,
+        jint cellWidth,
+        jint cellHeight) {
     jsize size = args ? env->GetArrayLength(args) : 0;
     char **argv = NULL;
     if (size > 0) {
         argv = (char **) malloc((size + 1) * sizeof(char *));
         if (!argv) return throw_runtime_exception(env, "Couldn't allocate argv array");
         for (int i = 0; i < size; ++i) {
-            jstring arg_java_string = (jstring) env->GetObjectArrayElement(args, i);
-            char const *arg_utf8 = env->GetStringUTFChars(arg_java_string, NULL);
+            auto arg_java_string = (jstring) env->GetObjectArrayElement(args, i);
+            char const *arg_utf8 = env->GetStringUTFChars(arg_java_string, nullptr);
             if (!arg_utf8)
                 return throw_runtime_exception(env, "GetStringUTFChars() failed for argv");
             argv[i] = strdup(arg_utf8);
@@ -159,7 +162,7 @@ extern "C" JNIEXPORT jint JNICALL Java_com_offsec_nhterm_backend_JNI_createSubpr
     int procId = 0;
     char const *cmd_cwd = env->GetStringUTFChars(cwd, NULL);
     char const *cmd_utf8 = env->GetStringUTFChars(cmd, NULL);
-    int ptm = create_subprocess(env, cmd_utf8, cmd_cwd, argv, envp, &procId, rows, columns);
+    int ptm = create_subprocess(env, cmd_utf8, cmd_cwd, argv, envp, &procId, rows, columns, cellWidth, cellHeight);
     env->ReleaseStringUTFChars(cmd, cmd_utf8);
     env->ReleaseStringUTFChars(cmd, cmd_cwd);
 
@@ -184,16 +187,19 @@ extern "C" JNIEXPORT jint JNICALL Java_com_offsec_nhterm_backend_JNI_createSubpr
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_offsec_nhterm_backend_JNI_setPtyWindowSize(JNIEnv *TERMUX_UNUSED(env),
-                                              jclass TERMUX_UNUSED(clazz),
-                                              jint fd, jint rows,
-                                              jint cols) {
-    struct winsize sz = {.ws_row = static_cast<unsigned short>(rows), .ws_col = static_cast<unsigned short>(cols)};
+Java_com_offsec_nhterm_backend_JNI_setPtyWindowSize(JNIEnv *NEO_UNUSED(env),
+                                              jclass NEO_UNUSED(clazz),
+                                              jint fd,
+                                              jint rows,
+                                              jint cols,
+                                              jint cell_width,
+                                              jint cell_height) {
+    struct winsize sz = {.ws_row = (unsigned short) rows, .ws_col = (unsigned short) cols, .ws_xpixel = (unsigned short) (cols * cell_width), .ws_ypixel = (unsigned short) (rows * cell_height)};
     ioctl(fd, TIOCSWINSZ, &sz);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_offsec_nhterm_backend_JNI_setPtyUTF8Mode(JNIEnv *TERMUX_UNUSED(env), jclass TERMUX_UNUSED(clazz),
+Java_com_offsec_nhterm_backend_JNI_setPtyUTF8Mode(JNIEnv *NEO_UNUSED(env), jclass NEO_UNUSED(clazz),
                                             jint fd) {
     struct termios tios;
     tcgetattr(fd, &tios);
@@ -204,7 +210,7 @@ Java_com_offsec_nhterm_backend_JNI_setPtyUTF8Mode(JNIEnv *TERMUX_UNUSED(env), jc
 }
 
 extern "C" JNIEXPORT int JNICALL
-Java_com_offsec_nhterm_backend_JNI_waitFor(JNIEnv *TERMUX_UNUSED(env), jclass TERMUX_UNUSED(clazz),
+Java_com_offsec_nhterm_backend_JNI_waitFor(JNIEnv *NEO_UNUSED(env), jclass NEO_UNUSED(clazz),
                                      jint pid) {
     int status;
     waitpid(pid, &status, 0);
@@ -219,7 +225,7 @@ Java_com_offsec_nhterm_backend_JNI_waitFor(JNIEnv *TERMUX_UNUSED(env), jclass TE
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_offsec_nhterm_backend_JNI_close(JNIEnv *TERMUX_UNUSED(env), jclass TERMUX_UNUSED(clazz),
+Java_com_offsec_nhterm_backend_JNI_close(JNIEnv *NEO_UNUSED(env), jclass NEO_UNUSED(clazz),
                                    jint fileDescriptor) {
     close(fileDescriptor);
 }

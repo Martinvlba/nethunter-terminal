@@ -16,7 +16,7 @@ import com.offsec.nhterm.component.colorscheme.NeoColorScheme
  * @author kiva
  */
 class ColorItem(var colorType: Int, var colorValue: String) : SortedListAdapter.ViewModel {
-  override fun <T> isSameModelAs(t: T): Boolean {
+  override fun <T : Any> isSameModelAs(t: T): Boolean {
     if (t is ColorItem) {
       return t.colorName == colorName
         && t.colorValue == colorValue
@@ -25,7 +25,7 @@ class ColorItem(var colorType: Int, var colorValue: String) : SortedListAdapter.
     return false
   }
 
-  override fun <T> isContentTheSameAs(t: T): Boolean {
+  override fun <T : Any> isContentTheSameAs(t: T): Boolean {
     return isSameModelAs(t)
   }
 

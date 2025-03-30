@@ -104,6 +104,7 @@ final class TerminalRenderer {
 
       long lastRunStyle = 0;
       boolean lastRunInsideCursor = false;
+      boolean lastRunInsideSelection = false;
       int lastRunStartColumn = -1;
       int lastRunStartIndex = 0;
       boolean lastRunFontWidthMismatch = false;
@@ -116,7 +117,8 @@ final class TerminalRenderer {
         final int charsForCodePoint = charIsHighsurrogate ? 2 : 1;
         final int codePoint = charIsHighsurrogate ? Character.toCodePoint(charAtIndex, line[currentCharIndex + 1]) : charAtIndex;
         final int codePointWcWidth = WcWidth.width(codePoint);
-        final boolean insideCursor = (column >= selx1 && column <= selx2) || (cursorX == column || (codePointWcWidth == 2 && cursorX == column + 1));
+        final boolean insideCursor = (cursorX == column || (codePointWcWidth == 2 && cursorX == column + 1));
+        final boolean insideSelection = column >= selx1 && column <= selx2;
         final long style = lineObject.getStyle(column);
 
         // Check if the measured text width for this code point is not the same as that expected by wcwidth().
@@ -127,20 +129,22 @@ final class TerminalRenderer {
           currentCharIndex, charsForCodePoint);
         final boolean fontWidthMismatch = Math.abs(measuredCodePointWidth / mFontWidth - codePointWcWidth) > 0.01;
 
-        if (style != lastRunStyle || insideCursor != lastRunInsideCursor || fontWidthMismatch || lastRunFontWidthMismatch) {
+        if (style != lastRunStyle || insideCursor != lastRunInsideCursor || insideSelection != lastRunInsideSelection || fontWidthMismatch || lastRunFontWidthMismatch) {
           if (column == 0) {
             // Skip first column as there is nothing to draw, just record the current style.
           } else {
             final int columnWidthSinceLastRun = column - lastRunStartColumn;
             final int charsSinceLastRun = currentCharIndex - lastRunStartIndex;
-            int cursorColor = lastRunInsideCursor ? mEmulator.mColors.mCurrentColors[TextStyle.COLOR_INDEX_CURSOR] : 0;
+            int cursorColor = (lastRunInsideCursor || lastRunInsideSelection) ? mEmulator.mColors.mCurrentColors[TextStyle.COLOR_INDEX_CURSOR] : 0;
+            int cursorStyle = lastRunInsideSelection ? TerminalEmulator.CURSOR_STYLE_BLOCK : cursorShape;
             drawTextRun(canvas, line, palette, heightOffset, lastRunStartColumn, columnWidthSinceLastRun,
               lastRunStartIndex, charsSinceLastRun, measuredWidthForRun,
-              cursorColor, cursorShape, lastRunStyle, reverseVideo);
+              cursorColor, cursorStyle, lastRunStyle, reverseVideo);
           }
           measuredWidthForRun = 0.f;
           lastRunStyle = style;
           lastRunInsideCursor = insideCursor;
+          lastRunInsideSelection = insideSelection;
           lastRunStartColumn = column;
           lastRunStartIndex = currentCharIndex;
           lastRunFontWidthMismatch = fontWidthMismatch;
@@ -157,9 +161,10 @@ final class TerminalRenderer {
 
       final int columnWidthSinceLastRun = columns - lastRunStartColumn;
       final int charsSinceLastRun = currentCharIndex - lastRunStartIndex;
-      int cursorColor = lastRunInsideCursor ? mEmulator.mColors.mCurrentColors[TextStyle.COLOR_INDEX_CURSOR] : 0;
+      int cursorColor = (lastRunInsideCursor || lastRunInsideSelection) ? mEmulator.mColors.mCurrentColors[TextStyle.COLOR_INDEX_CURSOR] : 0;
+      int cursorStyle = lastRunInsideSelection ? TerminalEmulator.CURSOR_STYLE_BLOCK : cursorShape;
       drawTextRun(canvas, line, palette, heightOffset, lastRunStartColumn, columnWidthSinceLastRun, lastRunStartIndex, charsSinceLastRun,
-        measuredWidthForRun, cursorColor, cursorShape, lastRunStyle, reverseVideo);
+        measuredWidthForRun, cursorColor, cursorStyle, lastRunStyle, reverseVideo);
     }
   }
 
@@ -242,10 +247,18 @@ final class TerminalRenderer {
       mTextPaint.setColor(foreColor);
 
       // The text alignment is the default Paint.Align.LEFT.
-      canvas.drawText(text, startCharIndex, runWidthChars, left, y - mFontLineSpacingAndAscent, mTextPaint);
+      canvas.drawTextRun(text, startCharIndex, runWidthChars, startCharIndex, runWidthChars, left, y - mFontLineSpacingAndAscent, false, mTextPaint);
     }
 
     if (savedMatrix) canvas.restore();
+  }
+
+  public float getFontWidth() {
+    return mFontWidth;
+  }
+
+  public int getFontLineSpacing() {
+    return mFontLineSpacing;
   }
 
   float getCursorX() {

@@ -26,7 +26,7 @@
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-      <androidx.cardview.widget.CardView
+      <com.google.android.material.card.MaterialCardView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -42,25 +42,24 @@
 
           <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="72dp"
+            android:layout_height="84dp"
             android:orientation="horizontal"
             android:padding="16dp">
 
             <ImageView
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_width="48dp"
+              android:layout_height="48dp"
               android:layout_gravity="center_vertical"
-              android:scaleType="center"
-              android:src="@mipmap/ic_launcher_foreground"/>
+              app:srcCompat="@mipmap/ic_launcher_round"/>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_gravity="center_vertical"
               android:paddingLeft="16dp"
               android:paddingRight="16dp"
               android:text="@string/app_name"
-              android:textSize="22sp"
+              android:textAlignment="center"
               android:autoSizeMaxTextSize="22sp"
               android:autoSizeMinTextSize="18sp"
               android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
@@ -177,9 +176,9 @@
 
         </LinearLayout>
 
-      </androidx.cardview.widget.CardView>
+      </com.google.android.material.card.MaterialCardView>
 
-      <androidx.cardview.widget.CardView
+      <com.google.android.material.card.MaterialCardView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -195,7 +194,7 @@
 
           <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="72dp"
+            android:layout_height="84dp"
             android:orientation="horizontal"
             android:padding="16dp">
 
@@ -203,7 +202,6 @@
               android:layout_width="48dp"
               android:layout_height="48dp"
               android:layout_gravity="center_vertical"
-              android:scaleType="centerCrop"
               app:srcCompat="@mipmap/ic_danger"/>
 
             <TextView
@@ -260,7 +258,7 @@
           </LinearLayout>
         </LinearLayout>
 
-      </androidx.cardview.widget.CardView>
+      </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
   </ScrollView>

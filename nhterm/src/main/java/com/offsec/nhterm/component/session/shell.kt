@@ -170,8 +170,8 @@ open class ShellTermSession private constructor(
 
   var exitPrompt = App.get().getString(R.string.process_exit_prompt)
 
-  override fun initializeEmulator(columns: Int, rows: Int) {
-    super.initializeEmulator(columns, rows)
+  override fun initializeEmulator(columns: Int, rows: Int, cell_width: Int, cell_height: Int) {
+    super.initializeEmulator(columns, rows, cell_width, cell_height)
 
     ////
     // As we do bash script trickery to move over from

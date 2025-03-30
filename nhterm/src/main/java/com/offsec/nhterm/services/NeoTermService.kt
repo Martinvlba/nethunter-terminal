@@ -192,7 +192,7 @@ class NeoTermService : Service() {
   private fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-    val channel = NotificationChannel(DEFAULT_CHANNEL_ID, "NetHunter", NotificationManager.IMPORTANCE_LOW)
+    val channel = NotificationChannel(DEFAULT_CHANNEL_ID, "NetHunter", NotificationManager.IMPORTANCE_HIGH)
     channel.description = "NetHunter notifications"
     val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     manager.createNotificationChannel(channel)
@@ -209,7 +209,7 @@ class NeoTermService : Service() {
       mWakeLock!!.acquire()
 
       val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-      mWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, EmulatorDebug.LOG_TAG)
+      mWifiLock = wm.createWifiLock(3, EmulatorDebug.LOG_TAG)
       mWifiLock!!.acquire()
 
       updateNotification()

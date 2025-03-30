@@ -9,23 +9,43 @@
   <uses-feature
     android:name="android.software.leanback"
     android:required="false"/>
+  <uses-feature
+    android:name="android.software.virtualization_framework"
+    android:required="false" />
 
-  <uses-permission android:name="android.permission.VIBRATE" />
-  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission
+    android:name="android.permission.VIBRATE" />
+  <uses-permission
+    android:name="android.permission.INTERNET" />
   <uses-permission
     android:name="android.permission.WRITE_EXTERNAL_STORAGE"
     tools:ignore="ScopedStorage" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission
+    android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission
+    android:name="android.permission.MANAGE_VIRTUAL_MACHINE" />
+  <uses-permission
+    android:name="android.permission.USE_CUSTOM_VIRTUAL_MACHINE" />
   <uses-permission
     android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
     tools:ignore="ScopedStorage" />
-  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission
+    android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission
+    android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+  <uses-permission
+    android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission
+    android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+  <uses-permission
+    android:name="android.permission.WAKE_LOCK" />
   <uses-permission
     android:name="android.permission.READ_LOGS"
     tools:ignore="ProtectedPermissions" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission
+    android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission
+    android:name="android.permission.FOREGROUND_SERVICE" />
 
 
   <application
@@ -80,6 +100,7 @@
       android:name=".ui.term.NeoTermRemoteInterface"
       android:configChanges="orientation|keyboardHidden"
       android:exported="true"
+      android:foregroundServiceType="specialUse"
       android:theme="@style/AppTheme"
       android:windowSoftInputMode="adjustResize|stateHidden">
       <intent-filter>
@@ -188,6 +209,7 @@
 
     <service
       android:name=".services.NeoTermService"
+      android:foregroundServiceType="specialUse"
       android:enabled="true"/>
 
     <meta-data

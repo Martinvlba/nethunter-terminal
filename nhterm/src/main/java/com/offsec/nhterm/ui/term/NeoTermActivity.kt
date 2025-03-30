@@ -62,6 +62,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
   var addSessionListener = createAddSessionListener()
   private var termService: NeoTermService? = null
 
+  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -86,7 +87,6 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     }
 
     setContentView(R.layout.ui_main)
-
     toolbar = findViewById(R.id.terminal_toolbar)
     setSupportActionBar(toolbar)
 
@@ -98,11 +98,8 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
             val tab = tabSwitcher.selectedTab as TermTab
             // isShow -> toolbarHide
             toggleToolbar(tab.toolbar, !isShow)
-
-            // When minimizing kb in nano the colors get changed to default value
-            // Updating colors here fixes this issue
-            update_colors()
           }
+          update_colors()
         }
       },
     )
@@ -113,7 +110,11 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     tabSwitcher.showToolbars(false)
 
     val serviceIntent = Intent(this, NeoTermService::class.java)
-    startService(serviceIntent)
+    if (Build.VERSION.SDK_INT >= 26) {
+      startForegroundService(serviceIntent);
+    } else {
+      startService(serviceIntent);
+    };
     bindService(serviceIntent, this, 0)
   }
 
@@ -145,8 +146,10 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
 
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      update_colors()
       menuInflater.inflate(R.menu.menu_main, menu)
     } else {
+      update_colors()
       menuInflater.inflate(R.menu.older_menu_main, menu)
     }
 
@@ -227,6 +230,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
 
         override fun onSelectionChanged(tabSwitcher: TabSwitcher, selectedTabIndex: Int, selectedTab: Tab?) {
           if (selectedTab is TermTab && selectedTab.termData.termSession != null) {
+            update_colors()
             NeoPreference.storeCurrentSession(selectedTab.termData.termSession!!)
           }
         }
@@ -237,6 +241,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
 
         override fun onTabRemoved(tabSwitcher: TabSwitcher, index: Int, tab: Tab, animation: Animation) {
           if (tab is TermTab) {
+            update_colors()
             SessionRemover.removeSession(termService, tab)
           } else if (tab is XSessionTab) {
             SessionRemover.removeXSession(termService, tab)
@@ -290,6 +295,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
   override fun onWindowFocusChanged(hasFocus: Boolean) {
     super.onWindowFocusChanged(hasFocus)
     val tab = tabSwitcher.selectedTab as NeoTab?
+    update_colors()
     tab?.onWindowFocusChanged(hasFocus)
   }
 
@@ -354,7 +360,6 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     }
   }
 
-  @RequiresApi(Build.VERSION_CODES.P)
   override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
     termService = (service as NeoTermService.NeoTermBinder).service
     if (termService == null) {
@@ -385,6 +390,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
+    update_colors()
     if (newConfig == null) {
       return
     }
@@ -631,10 +637,10 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     // Do not add the same session again
     // Or app will crash when rotate
     val tabCount = tabSwitcher.count
-    (0..(tabCount - 1))
+    (0..<tabCount)
       .map { tabSwitcher.getTab(it) }
       .filter { it is TermTab && it.termData.termSession == session }
-      .forEach { return }
+      .forEach { _ -> return }
 
     val sessionCallback = session.sessionChangedCallback as TermSessionCallback
     val viewClient = TermViewClient(this)
@@ -673,7 +679,7 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     (0..(tabCount - 1))
       .map { tabSwitcher.getTab(it) }
       .filter { it is XSessionTab && it.session == session }
-      .forEach { return }
+      .forEach { _ -> return }
 
     val tab = createXTab(session.mSessionName) as XSessionTab
 
@@ -794,6 +800,8 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
       return
     }
 
+    update_colors()
+
     if (showSwitcher) {
       tabSwitcher.showSwitcher()
     } else {
@@ -816,7 +824,6 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
       .forEach(callback)
   }
 
-  @Suppress("unused")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onTabCloseEvent(tabCloseEvent: TabCloseEvent) {
     val tab = tabCloseEvent.termTab
@@ -836,14 +843,12 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     }
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onToggleFullScreenEvent(toggleFullScreenEvent: ToggleFullScreenEvent) {
     val fullScreen = fullScreenHelper.fullScreen
     setFullScreenMode(!fullScreen)
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onToggleImeEvent(toggleImeEvent: ToggleImeEvent) {
     if (!tabSwitcher.isSwitcherShown) {
@@ -859,13 +864,11 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     }
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onCreateNewSessionEvent(createNewSessionEvent: CreateNewSessionEvent) {
     addNewSession()
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onSwitchSessionEvent(switchSessionEvent: SwitchSessionEvent) {
     if (tabSwitcher.count < 2) {
@@ -880,7 +883,6 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     switchToSession(tabSwitcher.getTab(nextIndex))
   }
 
-  @Suppress("unused", "UNUSED_PARAMETER")
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onSwitchIndexedSessionEvent(switchIndexedSessionEvent: SwitchIndexedSessionEvent) {
     val nextIndex = switchIndexedSessionEvent.index - 1
@@ -894,17 +896,14 @@ class NeoTermActivity : AppCompatActivity(), ServiceConnection, SharedPreference
     // Simple fix to bug on custom color
     Handler().postDelayed(
       {
-
         if (tabSwitcher.count > 0) {
           val tab = tabSwitcher.selectedTab
           if (tab is TermTab) {
             tab.updateColorScheme()
           }
         }
-
       },
-      100,
+      30,
     )
   }
-
 }

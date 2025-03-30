@@ -1,1 +1,2 @@
-include ':nhterm', ':chrome-tabs', ':NeoLang', ':Xorg', ':NeoTermBridge', 'safs-core', 'retrofile', 'modularadapter', 'sortedlistadapter', 'sortedlistitemmanager'
+include ':nhterm', ':chrome-tabs', ':NeoLang', ':Xorg', ':NeoTermBridge',
+  'safs-core', 'retrofile', 'modularadapter', 'sortedlistadapter', 'sortedlistitemmanager'

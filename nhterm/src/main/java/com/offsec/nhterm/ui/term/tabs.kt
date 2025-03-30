@@ -287,6 +287,7 @@ class TermTab(title: CharSequence) : NeoTab(title), TermUiPresenter {
   fun onFullScreenModeChanged(fullScreen: Boolean) {
     // Window token changed, we need to recreate PopupWindow
     resetAutoCompleteStatus()
+    updateColorScheme()
   }
 
   override fun requireHideIme() {

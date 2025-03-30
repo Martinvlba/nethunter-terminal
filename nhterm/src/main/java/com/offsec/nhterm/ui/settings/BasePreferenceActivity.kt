@@ -16,19 +16,14 @@
 package com.offsec.nhterm.ui.settings
 
 import android.content.res.Configuration
-import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
-import androidx.annotation.StyleRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.res.ResourcesCompat.ThemeCompat
-import androidx.preference.Preference
-import androidx.preference.PreferenceScreen
 import com.offsec.nhterm.R
 
 /**

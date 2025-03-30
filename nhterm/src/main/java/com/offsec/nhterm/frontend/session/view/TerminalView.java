@@ -10,8 +10,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -33,8 +31,6 @@ import com.offsec.nhterm.backend.TerminalSession;
 import com.offsec.nhterm.component.completion.OnAutoCompleteListener;
 
 import com.offsec.nhterm.R;
-import com.offsec.nhterm.backend.*;
-import com.offsec.nhterm.component.completion.OnAutoCompleteListener;
 
 /**
  * View displaying and interacting with a {@link TerminalSession}.
@@ -948,7 +944,7 @@ public final class TerminalView extends View {
     int newRows = Math.max(4, (viewHeight - mRenderer.mFontLineSpacingAndAscent) / mRenderer.mFontLineSpacing);
 
     if (mEmulator == null || (newColumns != mEmulator.mColumns || newRows != mEmulator.mRows)) {
-      mTermSession.updateSize(newColumns, newRows);
+      mTermSession.updateSize(newColumns, newRows, (int) mRenderer.getFontWidth(), mRenderer.getFontLineSpacing());
       mEmulator = mTermSession.getEmulator();
 
       mTopRow = 0;
