@@ -1061,29 +1061,13 @@ public final class TerminalEmulator {
   }
 
   /**
-
-
    * When in {@link #ESC_APC} (APC, Application Program Command) sequence.
-
-
    */
-
-
   private void doApc(int b) {
-
-
     if (b == 27) {
-
-
       continueSequence(ESC_APC_ESCAPE);
-
-
     }
-
-
     // Eat APC sequences silently for now.
-
-
   }
 
   /**
